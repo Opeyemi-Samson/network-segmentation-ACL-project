@@ -1,9 +1,24 @@
 SWITCH0 CONFIGURATION
+======================
 
 Device: Cisco Switch0
-Purpose: VLAN segmentation and trunk connectivity
+Purpose: VLAN segmentation, trunking, port security, and basic device hardening
+
+
+BASIC DEVICE SECURITY
+
+ Privileged EXEC mode password
+enable secret <YOUR_ENABLE_SECRET>
+
+ Login warning banner
+banner motd #Authorized users only#
+
+ Disable DNS lookup
+no ip domain-lookup
+
 
 VLAN CONFIGURATION
+
 
 vlan 10
  name IT
@@ -20,22 +35,23 @@ vlan 40
 
 ACCESS PORT CONFIGURATION
 
- IT devices
+
+ IT
 interface range fa0/1-2
  switchport mode access
  switchport access vlan 10
 
- Management devices
+ Management
 interface range fa0/3-4
  switchport mode access
  switchport access vlan 20
 
- Staff devices
+ Staff
 interface range fa0/5-8
  switchport mode access
  switchport access vlan 30
 
- Guest devices
+ Guest
 interface range fa0/9-10
  switchport mode access
  switchport access vlan 40
@@ -48,7 +64,21 @@ interface g0/1
  switchport mode trunk
 
 
+PORT SECURITY
+
+interface range fa0/1-10
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation shutdown
+
+
 VERIFICATION COMMANDS
+
 
 show vlan brief
 show interfaces trunk
+show port-security
+show port-security interface
+show running-config
