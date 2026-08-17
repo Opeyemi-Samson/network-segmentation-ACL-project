@@ -1,0 +1,54 @@
+SWITCH0 CONFIGURATION
+
+Device: Cisco Switch0
+Purpose: VLAN segmentation and trunk connectivity
+
+VLAN CONFIGURATION
+
+vlan 10
+ name IT
+
+vlan 20
+ name MANAGEMENT
+
+vlan 30
+ name STAFF
+
+vlan 40
+ name GUEST
+
+
+ACCESS PORT CONFIGURATION
+
+ IT devices
+interface range fa0/1-2
+ switchport mode access
+ switchport access vlan 10
+
+ Management devices
+interface range fa0/3-4
+ switchport mode access
+ switchport access vlan 20
+
+ Staff devices
+interface range fa0/5-8
+ switchport mode access
+ switchport access vlan 30
+
+ Guest devices
+interface range fa0/9-10
+ switchport mode access
+ switchport access vlan 40
+
+
+TRUNK CONFIGURATION
+
+ Connection to Router0
+interface g0/1
+ switchport mode trunk
+
+
+VERIFICATION COMMANDS
+
+show vlan brief
+show interfaces trunk
