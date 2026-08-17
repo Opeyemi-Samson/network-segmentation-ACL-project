@@ -1,0 +1,112 @@
+ROUTER0 CONFIGURATION
+=====================
+
+Device: Cisco Router0
+Purpose: Inter-VLAN routing, network security, and access control
+
+
+BASIC DEVICE SECURITY
+
+
+ Privileged EXEC mode password
+enable secret <YOUR_ENABLE_SECRET>
+
+ Login warning banner
+banner motd #Authorized users only#
+
+
+INTER-VLAN ROUTING
+
+ IT VLAN
+interface g0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+
+ Management VLAN
+interface g0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+
+ Staff VLAN
+interface g0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+
+ Guest VLAN
+interface g0/0.40
+ encapsulation dot1Q 40
+ ip address 192.168.40.1 255.255.255.0
+
+
+EXTERNAL / INTERNET INTERFACE
+
+interface g0/1
+ ip address 10.10.10.1 255.255.255.0
+ no shutdown
+
+
+ACCESS CONTROL LISTS
+
+ ACL 101 - IT
+ IT users have full access
+
+access-list 101 permit ip 192.168.10.0 0.0.0.255 any
+
+
+ ACL 102 - MANAGEMENT
+ Management can access Staff and approved IT services
+
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
+access-list 102 permit ip 192.168.20.0 0.0.0.255 192.168.30.0 0.0.0.255
+access-list 102 deny ip any any
+
+
+ ACL 103 - STAFF
+ Staff can access the Internet and approved IT services
+
+access-list 103 permit tcp 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
+access-list 103 permit tcp 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
+access-list 103 permit ip 192.168.30.0 0.0.0.255 10.10.10.0 0.0.0.255
+access-list 103 deny ip any any
+
+
+ ACL 104 - GUEST
+ Guest users can access only the external network
+
+access-list 104 permit ip 192.168.40.0 0.0.0.255 10.10.10.0 0.0.0.255
+access-list 104 deny ip any any
+
+
+ ACL 110 - INTERNET
+ External users can access the IT network only through
+ HTTP and HTTPS
+
+access-list 110 permit tcp 10.10.10.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
+access-list 110 permit tcp 10.10.10.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
+access-list 110 deny ip any any
+
+
+ACL APPLICATION
+
+interface g0/0.10
+ ip access-group 101 in
+
+interface g0/0.20
+ ip access-group 102 in
+
+interface g0/0.30
+ ip access-group 103 in
+
+interface g0/0.40
+ ip access-group 104 in
+
+interface g0/1
+ ip access-group 110 in
+
+
+VERIFICATION COMMANDS
+
+show ip interface brief
+show access-lists
+show running-config
